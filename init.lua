@@ -45,6 +45,13 @@ require('packer').startup(function(use)
   use("junegunn/fzf")
   use("junegunn/fzf.vim")
   use { 'neoclide/coc.nvim', branch='release' }
+  use 'xiyaowong/nvim-transparent'
+  use {
+  'lewis6991/gitsigns.nvim',
+  config = function()
+    require('gitsigns').setup()
+  end
+}
 end)
 
 -- Set colortheme
@@ -72,6 +79,21 @@ require("lualine").setup({
 })
 require('telescope').setup()
 require('nvim-tree').setup()
+require("transparent").setup({
+  enable = true, -- boolean: enable transparent
+  extra_groups = { -- table/string: additional groups that should be cleared
+    -- In particular, when you set it to 'all', that means all available groups
+
+    -- example of akinsho/nvim-bufferline.lua
+    "BufferLineTabClose",
+    "BufferlineBufferSelected",
+    "BufferLineFill",
+    "BufferLineBackground",
+    "BufferLineSeparator",
+    "BufferLineIndicatorSelected",
+  },
+  exclude = {}, -- table: groups you don't want to clear
+})
 
 vim.g.mapleader = " "
 
@@ -94,13 +116,13 @@ local inoremap = bind("i")
 
 nnoremap("<leader>ft", ":NvimTreeToggle<CR>")
 nnoremap("<C-p>", ":Telescope")
-nnoremap("<leader>ps", function()
+nnoremap("<leader>fs", function()
     require('telescope.builtin').grep_string({ search = vim.fn.input("Grep For > ")})
 end)
 nnoremap("<C-p>", function()
     require('telescope.builtin').git_files()
 end)
-nnoremap("<Leader>pf", function()
+nnoremap("<Leader>ff", function()
     require('telescope.builtin').find_files()
 end)
 
