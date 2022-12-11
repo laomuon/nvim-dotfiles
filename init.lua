@@ -1,5 +1,5 @@
 --vim.opt.guicursor = ""
-
+vim.opt.termguicolors = true
 vim.opt.nu = true
 vim.opt.relativenumber = true
 
@@ -44,6 +44,7 @@ require('packer').startup(function(use)
 
   -- Gruvbox colortheme
   use 'morhetz/gruvbox'
+  use { "catppuccin/nvim", as = "catppuccin" }
  
   use{
       'nvim-telescope/telescope.nvim',
@@ -61,12 +62,63 @@ require('packer').startup(function(use)
   use { 'neoclide/coc.nvim', branch='release' }
   use 'xiyaowong/nvim-transparent'
   use 'lewis6991/gitsigns.nvim'
+  use {
+    'goolord/alpha-nvim',
+    requires = { 'nvim-tree/nvim-web-devicons' },
+    }
+  use 'numToStr/Comment.nvim'
 end)
 -- Set colortheme
 vim.g.gruvbox_transparent_bg = '1'
 vim.g.gruvbox_invert_selection = '0'
 vim.g.gruvbox_contrast_dark = 'hard'
 
+require("Comment").setup()
+
+require("catppuccin").setup({
+    flavour = "latte", -- latte, frappe, macchiato, mocha
+    background = { -- :h background
+        light = "latte",
+        dark = "macchiato",
+    },
+    transparent_background = true,
+    term_colors = true,
+    dim_inactive = {
+        enabled = false,
+        shade = "dark",
+        percentage = 0.15,
+    },
+    no_italic = false, -- Force no italic
+    no_bold = false, -- Force no bold
+    styles = {
+        comments = {},
+        conditionals = {},
+        loops = {},
+        functions = {},
+        keywords = {},
+        strings = {},
+        variables = {},
+        numbers = {},
+        booleans = {},
+        properties = {},
+        types = {},
+        operators = {},
+    },
+    color_overrides = {
+        mocha = {
+            base = "#000000",
+        },
+    },
+    custom_highlights = {},
+    integrations = {
+        cmp = true,
+        gitsigns = true,
+        nvimtree = true,
+        telescope = true,
+        notify = false,
+        mini = false,
+    },
+})
 vim.cmd("colorscheme gruvbox")
 
 require('gitsigns').setup()
@@ -99,11 +151,46 @@ require("transparent").setup({
     "BufferLineFill",
     "BufferLineBackground",
     "BufferLineSeparator",
-    "BufferLineIndicatorSelected",
+    "BufferLineIndicatorSelected"
   },
   exclude = {}, -- table: groups you don't want to clear
 })
 
+local alpha = require("alpha")
+local dashboard = require("alpha.themes.dashboard")
+
+-- Set header
+dashboard.section.header.val = {
+    "                                                     ",
+    "  ███╗   ██╗███████╗ ██████╗ ██╗   ██╗██╗███╗   ███╗ ",
+    "  ████╗  ██║██╔════╝██╔═══██╗██║   ██║██║████╗ ████║ ",
+    "  ██╔██╗ ██║█████╗  ██║   ██║██║   ██║██║██╔████╔██║ ",
+    "  ██║╚██╗██║██╔══╝  ██║   ██║╚██╗ ██╔╝██║██║╚██╔╝██║ ",
+    "  ██║ ╚████║███████╗╚██████╔╝ ╚████╔╝ ██║██║ ╚═╝ ██║ ",
+    "  ╚═╝  ╚═══╝╚══════╝ ╚═════╝   ╚═══╝  ╚═╝╚═╝     ╚═╝ ",
+    "                                                     ",
+}
+
+-- Set menu
+dashboard.section.buttons.val = {
+    dashboard.button( "e", "  > New file" , ":ene <BAR> startinsert <CR>"),
+    dashboard.button( "f", "  > Find file", ":cd /home/muon/eureka | Telescope find_files<CR>"),
+    dashboard.button( "r", "  > Recent"   , ":Telescope oldfiles<CR>"),
+    dashboard.button( "s", "  > Settings" , ":e $MYVIMRC | :cd %:p:h | split . | wincmd k | pwd<CR>"),
+    dashboard.button( "q", "  > Quit NVIM", ":qa<CR>"),
+}
+
+-- Set footer
+ local fortune = require("alpha.fortune") 
+ dashboard.section.footer.val = fortune()
+
+-- Send config to alpha
+alpha.setup(dashboard.opts)
+
+-- Disable folding on alpha buffer
+vim.cmd([[
+    autocmd FileType alpha setlocal nofoldenable
+]])
 vim.g.mapleader = " "
 
 local function bind(op, outer_opts)
