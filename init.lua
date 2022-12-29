@@ -1,4 +1,4 @@
---vim.opt.guicursor = ""
+vim.opt.guicursor = ""
 vim.opt.termguicolors = true
 vim.opt.nu = true
 vim.opt.relativenumber = true
@@ -10,6 +10,7 @@ vim.opt.softtabstop = 4
 vim.opt.shiftwidth = 4
 vim.opt.expandtab = true
 vim.opt.cursorline = true
+vim.opt.list = true
 
 vim.opt.smartindent = true
 
@@ -37,7 +38,7 @@ vim.cmd [[packadd packer.nvim]]
 require('packer').startup(function(use)
   -- Packer can manage itself
   use 'wbthomason/packer.nvim'
-  
+
   -- A file tree written in lua
   use {
   'nvim-tree/nvim-tree.lua',
@@ -49,8 +50,12 @@ require('packer').startup(function(use)
 
   -- Gruvbox colortheme
   use 'morhetz/gruvbox'
+  -- Catppuccin theme
   use { "catppuccin/nvim", as = "catppuccin" }
- 
+  -- Nord theme
+  use 'arcticicestudio/nord-vim'
+  -- Kanagawa theme
+  use 'rebelot/kanagawa.nvim'
   use{
       'nvim-telescope/telescope.nvim',
       requires = {{'nvim-lua/plenary.nvim'} }
@@ -66,6 +71,7 @@ require('packer').startup(function(use)
   use("junegunn/fzf.vim")
   use 'xiyaowong/nvim-transparent'
   use 'lewis6991/gitsigns.nvim'
+  use 'lukas-reineke/indent-blankline.nvim'
   use {
     'goolord/alpha-nvim',
     requires = { 'nvim-tree/nvim-web-devicons' },
@@ -100,6 +106,7 @@ vim.g.gruvbox_contrast_dark = 'hard'
 
 require("Comment").setup()
 
+require("kanagawa").setup()
 require("catppuccin").setup({
     flavour = "latte", -- latte, frappe, macchiato, mocha
     background = { -- :h background
@@ -144,8 +151,9 @@ require("catppuccin").setup({
         mini = false,
     },
 })
-vim.cmd("colorscheme gruvbox")
+vim.cmd("colorscheme kanagawa")
 
+require('indent_blankline').setup()
 require('gitsigns').setup()
 require'nvim-treesitter.configs'.setup {
     ensure_installed = "all",
@@ -161,6 +169,7 @@ require("lualine").setup({
     sections = sections,
     options = {
         icons_enabled = true,
+        theme = 'kanagawa',
     }
 })
 require('telescope').setup()
@@ -236,7 +245,7 @@ local xnoremap = bind("x")
 local inoremap = bind("i")
 
 nnoremap("<leader>fp", ":echo @%<CR>")
-nnoremap("<leader>ft", ":NvimTreeToggle<CR>")
+nnoremap("<leader>ft", ":NvimTreeFindFileToggle<CR>")
 nnoremap("<Esc>", ":noh<CR>")
 nnoremap("<C-p>", ":Telescope")
 nnoremap("<leader>pw", function()
@@ -262,44 +271,6 @@ end)
 nnoremap("<C-d>", "<C-d>zz")
 nnoremap("<C-u>", "<C-u>zz")
 
--- keymap for coc
--- local keyset = vim.keymap.set
-
--- local opts = {silent = true, noremap = true, expr = true, replace_keycodes = false}
--- keyset("i", "<cr>", [[coc#pum#visible() ? coc#pum#confirm() : "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"]], opts)
---
--- -- GoTo code navigation.
--- keyset("n", "gd", "<Plug>(coc-definition)", {silent = true})
--- keyset("n", "gy", "<Plug>(coc-type-definition)", {silent = true})
--- keyset("n", "gi", "<Plug>(coc-implementation)", {silent = true})
--- keyset("n", "gr", "<Plug>(coc-references)", {silent = true})
---
--- -- Use K to show documentation in preview window.
--- function _G.show_docs()
---     local cw = vim.fn.expand('<cword>')
---     if vim.fn.index({'vim', 'help'}, vim.bo.filetype) >= 0 then
---         vim.api.nvim_command('h ' .. cw)
---     elseif vim.api.nvim_eval('coc#rpc#ready()') then
---         vim.fn.CocActionAsync('doHover')
---     else
---         vim.api.nvim_command('!' .. vim.o.keywordprg .. ' ' .. cw)
---     end
--- end
--- keyset("n", "K", '<CMD>lua _G.show_docs()<CR>', {silent = true})
---
---
--- -- Highlight the symbol and its references when holding the cursor.
--- vim.api.nvim_create_augroup("CocGroup", {})
--- vim.api.nvim_create_autocmd("CursorHold", {
---     group = "CocGroup",
---     command = "silent call CocActionAsync('highlight')",
---     desc = "Highlight symbol under cursor on CursorHold"
--- })
--- -- Remap <C-f> and <C-b> for scroll float windows/popups.
--- ---@diagnostic disable-next-line: redefined-local
--- local opts = {silent = true, nowait = true, expr = true}
--- keyset("n", "<C-f>", 'coc#float#has_scroll() ? coc#float#scroll(1) : "<C-f>"', opts)
--- keyset("n", "<C-b>", 'coc#float#has_scroll() ? coc#float#scroll(0) : "<C-b>"', opts)
 
 local lsp = require('lsp-zero')
 
@@ -311,5 +282,16 @@ lsp.preset('recommended')
 --     {name = 'buffer', keyword_length = 3},
 --   }
 -- })
+local cmp = require('cmp')
+local cmp_mappings = lsp.defaults.cmp_mappings({
+    ['<C-j>'] = cmp.mapping.select_next_item(),
+    ['<C-k>'] = cmp.mapping.select_prev_item(),
+})
+lsp.setup_nvim_cmp({
+    mapping = cmp_mappings
+})
 lsp.setup()
 
+-- vim.opt.foldlevel = 20
+vim.opt.foldmethod = "expr"
+vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
