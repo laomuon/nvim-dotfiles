@@ -65,18 +65,19 @@ require('packer').startup(function(use)
   use("nvim-treesitter/nvim-treesitter", {
         run = ":TSUpdate"
     })
+    use 'nvim-treesitter/nvim-treesitter-context'
   use("junegunn/fzf")
   use("junegunn/fzf.vim")
   use 'xiyaowong/nvim-transparent'
   use 'lewis6991/gitsigns.nvim'
-  use 'rebelot/kanagawa.nvim'
+  use ({'rebelot/kanagawa.nvim', commit = 'fc2e308'})
   use 'lukas-reineke/indent-blankline.nvim'
   use {
     'goolord/alpha-nvim',
     requires = { 'nvim-tree/nvim-web-devicons' },
     }
-  use 'numToStr/Comment.nvim'
-  use {
+    use 'numToStr/Comment.nvim'
+    use {
   'VonHeikemen/lsp-zero.nvim',
   requires = {
     -- LSP Support
@@ -99,6 +100,9 @@ require('packer').startup(function(use)
     -- Linting
     {'jose-elias-alvarez/null-ls.nvim'},
     {'jay-babu/mason-null-ls.nvim'},
+
+    -- Markdown
+    use {'iamcco/markdown-preview.nvim'}
   }
 }
 end)
@@ -109,7 +113,6 @@ vim.g.gruvbox_contrast_dark = 'hard'
 
 require("Comment").setup()
 
-require("kanagawa").setup()
 require("catppuccin").setup({
     flavour = "latte", -- latte, frappe, macchiato, mocha
     background = { -- :h background
@@ -157,16 +160,61 @@ require("catppuccin").setup({
 vim.cmd("colorscheme kanagawa")
 
 require('indent_blankline').setup()
-require('gitsigns').setup({current_line_blame = true, })
+require('gitsigns').setup{
+    current_line_blame = true,
+  on_attach = function(bufnr)
+    local gs = package.loaded.gitsigns
+
+    local function map(mode, l, r, opts)
+      opts = opts or {}
+      opts.buffer = bufnr
+      vim.keymap.set(mode, l, r, opts)
+    end
+
+    -- Navigation
+    map('n', ']c', function()
+      if vim.wo.diff then return ']c' end
+      vim.schedule(function() gs.next_hunk() end)
+      return '<Ignore>'
+    end, {expr=true})
+
+    map('n', '[c', function()
+      if vim.wo.diff then return '[c' end
+      vim.schedule(function() gs.prev_hunk() end)
+      return '<Ignore>'
+    end, {expr=true})
+
+    -- Actions
+    map({'n', 'v'}, '<leader>hs', ':Gitsigns stage_hunk<CR>')
+    map({'n', 'v'}, '<leader>hr', ':Gitsigns reset_hunk<CR>')
+    map('n', '<leader>hS', gs.stage_buffer)
+    map('n', '<leader>hu', gs.undo_stage_hunk)
+    map('n', '<leader>hR', gs.reset_buffer)
+    map('n', '<leader>hp', gs.preview_hunk)
+    map('n', '<leader>hb', function() gs.blame_line{full=true} end)
+    map('n', '<leader>tb', gs.toggle_current_line_blame)
+    map('n', '<leader>hd', gs.diffthis)
+    map('n', '<leader>hD', function() gs.diffthis('~') end)
+    map('n', '<leader>td', gs.toggle_deleted)
+
+    -- Text object
+    map({'o', 'x'}, 'ih', ':<C-U>Gitsigns select_hunk<CR>')
+  end
+}
 require'nvim-treesitter.configs'.setup {
-    ensure_installed = "all",
+    ensure_installed = {"c", "bash", "lua", "python", "vim", "help", "query", "cpp", "markdown"},
     sync_install = false,
+    indent = {
+        enable = true,
+    },
 
     highlight = {
         enable = true,
         additional_vim_regex_highlighting = false,
     },
 }
+
+require'treesitter-context'.setup()
 
 require("lualine").setup({
     sections = sections,
@@ -175,14 +223,27 @@ require("lualine").setup({
         theme = 'kanagawa',
     }
 })
-require('telescope').setup()
-require('nvim-tree').setup {
+require('telescope').setup({
+    defaults = {
+        wrap_results = true,
+    },
+})
+require('nvim-tree').setup ({
     actions={
         open_file = {
             resize_window = true
         }
+    },
+    view = {
+        float = {
+            enable = true,
+            open_win_config = {
+                width = 60,
+                height = 40,
+            }
+        }
     }
-}
+})
 require("transparent").setup({
   enable = true, -- boolean: enable transparent
   extra_groups = { -- table/string: additional groups that should be cleared
@@ -204,14 +265,31 @@ local dashboard = require("alpha.themes.dashboard")
 
 -- Set header
 dashboard.section.header.val = {
-    "                                                     ",
-    "  ███╗   ██╗███████╗ ██████╗ ██╗   ██╗██╗███╗   ███╗ ",
-    "  ████╗  ██║██╔════╝██╔═══██╗██║   ██║██║████╗ ████║ ",
-    "  ██╔██╗ ██║█████╗  ██║   ██║██║   ██║██║██╔████╔██║ ",
-    "  ██║╚██╗██║██╔══╝  ██║   ██║╚██╗ ██╔╝██║██║╚██╔╝██║ ",
-    "  ██║ ╚████║███████╗╚██████╔╝ ╚████╔╝ ██║██║ ╚═╝ ██║ ",
-    "  ╚═╝  ╚═══╝╚══════╝ ╚═════╝   ╚═══╝  ╚═╝╚═╝     ╚═╝ ",
-    "                                                     ",
+"                                                                                                ",
+              "                                                                                                ",
+              "                                                                                                ",
+              "                                                                                                ",
+              "                                                                                                ",
+              "         -╲         '-                                                                          ",
+              "       -' :╲        │ '-                                                                        ",
+              "     -'   : ╲       │   '-                          │MMM│                                       ",
+              "   -'·    :  ╲      │     '-                        │WWW│                                       ",
+              "  '.-.·   :   ╲     │       │                                                                   ",
+              "  │. .-·  :    ╲    │       │    MMM=         =MMM  │MMM│  │M│  +===+   +====+                  ",
+              "  │ . .-· :     ╲   │       │    ╲HHB`       'BHH╱  │HHH│  │H│╲╱sMMMs╲_╱sMMMMs╲                 ",
+              "  │. . .-·;      ╲  │       │     ╲HHH╲     ╱HHH╱   │HHH│  │HBBWWWWWHMMMHWWWW:B╲                ",
+              "  │ . . .-│       ╲ │       │      ╲HHH╲   ╱HHH╱    │HHH│  │HK╱     ╲KYK╱    ╲KH│               ",
+              "  │. . . .│╲       ╲│       │       ╲HHH╲ ╱HHH╱     │HHH│  │H│       │H│      │H│               ",
+              "  │ . . . │ ╲       ;-      │        ╲HHHVHHH╱      │HHH│  │H│       │H│      │H│               ",
+              "  │. . . .│  ╲      :·-     │         ╲HHHHH╱       │HHH│  │H│       │H│      │H│               ",
+              "  │ . . . │   ╲     : .-    │          ╲HHH╱        │HHH│  │H│       │H│      │H│               ",
+              "  │. . . .│    ╲    :. .-   │           ╲W╱         │WWW│  │W│       │W│      │W│               ",
+              "  `- . . .│     ╲   : . .- -'                                                                   ",
+              "    `- . .│      ╲  :. ..-'                                                                     ",
+              "      `-. │       ╲ :..-'                                                                       ",
+              "         `│        ╲;-'                                                                         ",
+              "                                                                                                ",
+              "                                                                                                ",
 }
 
 -- Set menu
@@ -230,6 +308,54 @@ dashboard.section.buttons.val = {
 -- Send config to alpha
 alpha.setup(dashboard.opts)
 
+vim.cmd [[
+let g:mkdp_auto_start = 0
+
+let g:mkdp_auto_close = 1
+
+let g:mkdp_refresh_slow = 0
+
+let g:mkdp_command_for_global = 0
+
+let g:mkdp_open_to_the_world = 0
+
+let g:mkdp_open_ip = ''
+
+let g:mkdp_browser = 'firefox'
+
+let g:mkdp_echo_preview_url = 0
+  function OpenMarkdownPreview (url)
+    execute "silent ! firefox --new-window " . a:url
+  endfunction
+  let g:mkdp_browserfunc = 'OpenMarkdownPreview'
+
+let g:mkdp_preview_options = {
+    \ 'mkit': {},
+    \ 'katex': {},
+    \ 'uml': {},
+    \ 'maid': {},
+    \ 'disable_sync_scroll': 0,
+    \ 'sync_scroll_type': 'middle',
+    \ 'hide_yaml_meta': 1,
+    \ 'sequence_diagrams': {},
+    \ 'flowchart_diagrams': {},
+    \ 'content_editable': v:false,
+    \ 'disable_filename': 0,
+    \ 'toc': {}
+    \ }
+
+let g:mkdp_markdown_css = 'expand("~/github-markdown.css")'
+
+let g:mkdp_highlight_css = 'expand("~/highlight.css")'
+
+let g:mkdp_port = ''
+
+let g:mkdp_page_title = '「${name}」'
+
+let g:mkdp_filetypes = ['markdown']
+
+let g:mkdp_theme = 'dark'
+]]
 -- Disable folding on alpha buffer
 vim.cmd([[
     autocmd FileType alpha setlocal nofoldenable
@@ -281,6 +407,7 @@ nnoremap("<C-d>", "<C-d>zz")
 nnoremap("<C-u>", "<C-u>zz")
 nnoremap("<C-w>v", "<C-w>v<C-w>l")
 nnoremap("<C-w>s", "<C-w>s<C-w>j")
+nnoremap("<leader>mp", ":MarkdownPreviewToggle<CR>")
 
 
 local lsp = require('lsp-zero')
