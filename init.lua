@@ -34,67 +34,66 @@ vim.opt.signcolumn = "yes"
 
 vim.opt.scrolloff = 8
 
+vim.g.netrw_banner = 0
+
 vim.cmd [[packadd packer.nvim]]
 vim.cmd('syntax enable')
 
 require('packer').startup(function(use)
-  -- Packer can manage itself
-  use 'wbthomason/packer.nvim'
+    -- Packer can manage itself
+    use 'wbthomason/packer.nvim'
 
-  -- A file tree written in lua
-  use {
-  'nvim-tree/nvim-tree.lua',
-  requires = {
-    'nvim-tree/nvim-web-devicons', -- optional, for file icons
-  },
-  tag = 'nightly' -- optional, updated every week. (see issue #1193)
-  }
+    -- A file tree written in lua
+    use {
+        'nvim-tree/nvim-tree.lua',
+        requires = {
+            'nvim-tree/nvim-web-devicons', -- optional, for file icons
+        },
+        tag = 'nightly' -- optional, updated every week. (see issue #1193)
+    }
 
-  use{
-      'nvim-telescope/telescope.nvim',
-      requires = {{'nvim-lua/plenary.nvim'} }
-  }
+    use{
+        'nvim-telescope/telescope.nvim',
+        requires = {{'nvim-lua/plenary.nvim'} }
+    }
 
-  use({
+    use({
         'nvim-lualine/lualine.nvim',
-      })
-  use("nvim-treesitter/nvim-treesitter", {
+    })
+    use("nvim-treesitter/nvim-treesitter", {
         run = ":TSUpdate"
     })
     use 'nvim-treesitter/nvim-treesitter-context'
-  use("junegunn/fzf")
-  use("junegunn/fzf.vim")
-  use 'xiyaowong/nvim-transparent'
-  use 'lewis6991/gitsigns.nvim'
-  use ({'rebelot/kanagawa.nvim', commit = 'fc2e308'})
-  use 'lukas-reineke/indent-blankline.nvim'
+    use("junegunn/fzf")
+    use("junegunn/fzf.vim")
+    use 'xiyaowong/nvim-transparent'
+    use 'lewis6991/gitsigns.nvim'
+    use ({'rebelot/kanagawa.nvim', commit = 'fc2e308'})
+    use 'lukas-reineke/indent-blankline.nvim'
     use 'numToStr/Comment.nvim'
     use {
-  'VonHeikemen/lsp-zero.nvim',
-  requires = {
-    -- LSP Support
-    {'neovim/nvim-lspconfig'},
-    {'williamboman/mason.nvim'},
-    {'williamboman/mason-lspconfig.nvim'},
+        'VonHeikemen/lsp-zero.nvim',
+        branch = 'v3.x',
 
-    -- Autocompletion
-    {'hrsh7th/nvim-cmp'},
-    {'hrsh7th/cmp-buffer'},
-    {'hrsh7th/cmp-path'},
-    {'saadparwaiz1/cmp_luasnip'},
-    {'hrsh7th/cmp-nvim-lsp'},
-    {'hrsh7th/cmp-nvim-lua'},
+        requires = {
+            -- LSP Support
+            {'neovim/nvim-lspconfig'},
+            {'williamboman/mason.nvim'},
+            {'williamboman/mason-lspconfig.nvim'},
 
-    -- Snippets
-    {'L3MON4D3/LuaSnip'},
-    {'rafamadriz/friendly-snippets'},
+            -- Autocompletion
+            {'hrsh7th/nvim-cmp'},
+            {'hrsh7th/cmp-buffer'},
+            {'hrsh7th/cmp-path'},
+            {'saadparwaiz1/cmp_luasnip'},
+            {'hrsh7th/cmp-nvim-lsp'},
+            {'hrsh7th/cmp-nvim-lua'},
 
-    -- Linting
-    {'jose-elias-alvarez/null-ls.nvim'},
-    {'jay-babu/mason-null-ls.nvim'},
-
-  },
-}
+            -- Snippets
+            {'L3MON4D3/LuaSnip'},
+            {'rafamadriz/friendly-snippets'},
+        },
+    }
     use 'mbbill/undotree'
 end)
 
@@ -106,44 +105,44 @@ vim.cmd("colorscheme kanagawa")
 require('indent_blankline').setup()
 require('gitsigns').setup{
     current_line_blame = true,
-  on_attach = function(bufnr)
-    local gs = package.loaded.gitsigns
+    on_attach = function(bufnr)
+        local gs = package.loaded.gitsigns
 
-    local function map(mode, l, r, opts)
-      opts = opts or {}
-      opts.buffer = bufnr
-      vim.keymap.set(mode, l, r, opts)
+        local function map(mode, l, r, opts)
+            opts = opts or {}
+            opts.buffer = bufnr
+            vim.keymap.set(mode, l, r, opts)
+        end
+
+        -- Navigation
+        map('n', ']c', function()
+            if vim.wo.diff then return ']c' end
+            vim.schedule(function() gs.next_hunk() end)
+            return '<Ignore>'
+        end, {expr=true})
+
+        map('n', '[c', function()
+            if vim.wo.diff then return '[c' end
+            vim.schedule(function() gs.prev_hunk() end)
+            return '<Ignore>'
+        end, {expr=true})
+
+        -- Actions
+        map({'n', 'v'}, '<leader>hs', ':Gitsigns stage_hunk<CR>')
+        map({'n', 'v'}, '<leader>hr', ':Gitsigns reset_hunk<CR>')
+        map('n', '<leader>hS', gs.stage_buffer)
+        map('n', '<leader>hu', gs.undo_stage_hunk)
+        map('n', '<leader>hR', gs.reset_buffer)
+        map('n', '<leader>hp', gs.preview_hunk)
+        map('n', '<leader>hb', function() gs.blame_line{full=true} end)
+        map('n', '<leader>tb', gs.toggle_current_line_blame)
+        map('n', '<leader>hd', gs.diffthis)
+        map('n', '<leader>hD', function() gs.diffthis('~') end)
+        map('n', '<leader>td', gs.toggle_deleted)
+
+        -- Text object
+        map({'o', 'x'}, 'ih', ':<C-U>Gitsigns select_hunk<CR>')
     end
-
-    -- Navigation
-    map('n', ']c', function()
-      if vim.wo.diff then return ']c' end
-      vim.schedule(function() gs.next_hunk() end)
-      return '<Ignore>'
-    end, {expr=true})
-
-    map('n', '[c', function()
-      if vim.wo.diff then return '[c' end
-      vim.schedule(function() gs.prev_hunk() end)
-      return '<Ignore>'
-    end, {expr=true})
-
-    -- Actions
-    map({'n', 'v'}, '<leader>hs', ':Gitsigns stage_hunk<CR>')
-    map({'n', 'v'}, '<leader>hr', ':Gitsigns reset_hunk<CR>')
-    map('n', '<leader>hS', gs.stage_buffer)
-    map('n', '<leader>hu', gs.undo_stage_hunk)
-    map('n', '<leader>hR', gs.reset_buffer)
-    map('n', '<leader>hp', gs.preview_hunk)
-    map('n', '<leader>hb', function() gs.blame_line{full=true} end)
-    map('n', '<leader>tb', gs.toggle_current_line_blame)
-    map('n', '<leader>hd', gs.diffthis)
-    map('n', '<leader>hD', function() gs.diffthis('~') end)
-    map('n', '<leader>td', gs.toggle_deleted)
-
-    -- Text object
-    map({'o', 'x'}, 'ih', ':<C-U>Gitsigns select_hunk<CR>')
-  end
 }
 require'nvim-treesitter.configs'.setup {
     ensure_installed = {"c", "bash", "lua", "python", "vim", "query", "cpp", "markdown"},
@@ -200,18 +199,18 @@ require('nvim-tree').setup ({
     }
 })
 require("transparent").setup({
-  extra_groups = { -- table/string: additional groups that should be cleared
-    -- In particular, when you set it to 'all', that means all available groups
+    extra_groups = { -- table/string: additional groups that should be cleared
+        -- In particular, when you set it to 'all', that means all available groups
 
-    -- example of akinsho/nvim-bufferline.lua
-    "BufferLineTabClose",
-    "BufferlineBufferSelected",
-    "BufferLineFill",
-    "BufferLineBackground",
-    "BufferLineSeparator",
-    "BufferLineIndicatorSelected"
-  },
-  exclude_groups = {}, -- table: groups you don't want to clear
+        -- example of akinsho/nvim-bufferline.lua
+        "BufferLineTabClose",
+        "BufferlineBufferSelected",
+        "BufferLineFill",
+        "BufferLineBackground",
+        "BufferLineSeparator",
+        "BufferLineIndicatorSelected"
+    },
+    exclude_groups = {}, -- table: groups you don't want to clear
 })
 
 vim.g.mapleader = " "
@@ -268,69 +267,81 @@ nnoremap("<C-u>", "<C-u>zz")
 nnoremap("<C-w>v", "<C-w>v<C-w>l")
 nnoremap("<C-w>s", "<C-w>s<C-w>j")
 
-
-local lsp = require('lsp-zero')
-
-lsp.preset({
-    name='recommended',
-    set_lsp_keymaps={preserve_mappings=true, omit={"gd","gr", "C-p"}}
-})
-local cmp = require('cmp')
-lsp.setup_nvim_cmp({
-  sources = {
-    {name = 'path'},
-    {name = 'nvim_lsp', keyword_length = 3},
-    {name = 'buffer', keyword_length = 3},
-    {name = 'luasnip', keyword_length = 2},
-  }
-})
 vim.o.foldcolumn = '1'
-vim.o.foldlevel = 99 -- Using ufo provider need a large value, feel free to decrease the value
+vim.o.foldlevel = 99
 vim.o.foldlevelstart = 99
 vim.o.foldenable = true
 
+local lsp = require('lsp-zero')
+
 lsp.on_attach(function(client, bufnr)
-  lsp.default_keymaps({buffer = bufnr})
+    lsp.default_keymaps({buffer = bufnr, exclude = {"gd", "gr", "C-p"},})
 end)
 
-lsp.set_server_config({
-  capabilities = {
-    textDocument = {
-      foldingRange = {
-        dynamicRegistration = false,
-        lineFoldingOnly = true
-      }
-    }
-  }
+require('mason').setup({})
+require('mason-lspconfig').setup({
+    ensure_installed = {},
+    handlers = {
+        lsp.default_setup,
+        lua_ls = function()
+            local lua_opts = lsp.nvim_lua_ls()
+            require('lspconfig').lua_ls.setup(lua_opts)
+        end,
+    },
 })
-
-lsp.setup({})
-cmp.setup({
-  mapping = {
-    -- `Enter` key to confirm completion
-    ['<CR>'] = cmp.mapping.confirm({select = true}),
-    ['<C-j>'] = cmp.mapping.select_next_item(),
-    ['<C-k>'] = cmp.mapping.select_prev_item(),
-    }
+lsp.set_sign_icons({
+    error = '✘',
+    warn = '▲',
+    hint = '⚑',
+    info = ''
 })
-
-null_ls = require("null-ls")
-lsp_config = require("lspconfig")
-local code_actions = null_ls.builtins.code_actions
-local diagnostics = null_ls.builtins.diagnostics
-local formatting = null_ls.builtins.formatting
--- local null_ls = require("null-ls").setup()
-local mason_null = require("mason-null-ls")
-mason_null.setup({
-        automatic_installation = true,
-        automatic_setup = true,
-
-    })
 vim.diagnostic.config({
-  virtual_text = true,
-  signs = true,
-  update_in_insert = false,
-  underline = true,
-  severity_sort = false,
-  float = {border = "single"},
+    virtual_text = true,
+    signs = true,
+    update_in_insert = false,
+    underline = true,
+    severity_sort = false,
+    float = {
+        style = 'minimal',
+        border = 'rounded',
+        source = 'always',
+        header = '',
+        prefix = '',
+    },
 })
+local cmp = require('cmp')
+local cmp_action = lsp.cmp_action()
+local cmp_format = lsp.cmp_format()
+
+require('luasnip.loaders.from_vscode').lazy_load()
+
+vim.opt.completeopt = {'menu', 'menuone', 'noselect'}
+
+cmp.setup({
+    formatting = cmp_format,
+    preselect = 'item',
+    completion = {
+        completeopt = 'menu,menuone,noinsert'
+    },
+    window = {
+        documentation = cmp.config.window.bordered(),
+    },
+    sources = {
+        {name = 'path'},
+        {name = 'nvim_lsp'},
+        {name = 'nvim_lua'},
+        {name = 'buffer', keyword_length = 3},
+        {name = 'luasnip', keyword_length = 2},
+    },
+    mapping = {
+        -- `Enter` key to confirm completion
+        ['<CR>'] = cmp.mapping.confirm({select = true}),
+        ['<C-j>'] = cmp.mapping.select_next_item(),
+        ['<C-k>'] = cmp.mapping.select_prev_item(),
+
+        -- tab complete
+        ['<Tab>'] = cmp_action.tab_complete(),
+        ['<S-Tab>'] = cmp.mapping.select_prev_item(),
+    }
+})
+
