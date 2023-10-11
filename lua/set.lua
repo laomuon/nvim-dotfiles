@@ -34,7 +34,8 @@ vim.opt.signcolumn = "yes"
 
 vim.opt.scrolloff = 8
 
-vim.g.netrw_banner = 0
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
 
 vim.cmd('syntax enable')
 
@@ -43,3 +44,4 @@ vim.o.foldlevel = 99
 vim.o.foldlevelstart = 99
 vim.o.foldenable = true
 
+vim.opt.path = vim.opt.path + "**"
