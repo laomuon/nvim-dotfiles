@@ -34,7 +34,6 @@ require("lazy").setup(
         'nvim-treesitter/nvim-treesitter-context',
         "junegunn/fzf",
         "junegunn/fzf.vim",
-        "xiyaowong/nvim-transparent",
         "lewis6991/gitsigns.nvim",
         {"rebelot/kanagawa.nvim", commit = 'fc2e308', lazy=true},
         {"lukas-reineke/indent-blankline.nvim", main="ibl", opts={}},
