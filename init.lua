@@ -1,4 +1,4 @@
 require("set")
 require("keymap")
-require("plugins")
+require("lazy_config")
 
