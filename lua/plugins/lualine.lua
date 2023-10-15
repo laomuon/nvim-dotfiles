@@ -4,7 +4,7 @@ return {
         sections = sections,
         options = {
             icons_enabled = true,
-            theme = 'nord',
+            theme = 'auto',
         }
     }
 }

@@ -22,7 +22,8 @@ end
 nvim_tree.opts = {
     actions={
         open_file = {
-            resize_window = true
+            resize_window = true,
+            quit_on_open=true,
         }
     },
     view = {
