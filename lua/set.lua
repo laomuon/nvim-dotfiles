@@ -45,3 +45,5 @@ vim.o.foldlevelstart = 99
 vim.o.foldenable = true
 
 vim.opt.path = vim.opt.path + "**"
+
+vim.g.editorconfig = false
