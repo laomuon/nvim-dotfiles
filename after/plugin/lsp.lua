@@ -13,6 +13,17 @@ require('mason-lspconfig').setup({
             local lua_opts = lsp.nvim_lua_ls()
             require('lspconfig').lua_ls.setup(lua_opts)
         end,
+        robotframework_ls = function()
+            require('lspconfig').robotframework_ls.setup({
+                settings = {
+                    robot = {
+                        python = {
+                            executable = os.getenv("ROBOT_TEST_ENV_EXE")
+                        }
+                    }
+                }
+            })
+        end,
     },
 })
 lsp.set_sign_icons({
