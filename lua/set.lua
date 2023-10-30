@@ -39,6 +39,7 @@ vim.g.loaded_netrwPlugin = 1
 
 vim.cmd('syntax enable')
 
+vim.o.foldmethod = 'indent'
 vim.o.foldcolumn = '1'
 vim.o.foldlevel = 99
 vim.o.foldlevelstart = 99
