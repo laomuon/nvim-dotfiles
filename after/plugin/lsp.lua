@@ -77,7 +77,7 @@ cmp.setup({
         ['<C-k>'] = cmp.mapping.select_prev_item(),
 
         -- tab complete
-        ['<Tab>'] = cmp_action.tab_complete(),
+        -- ['<Tab>'] = cmp_action.tab_complete(),
         ['<S-Tab>'] = cmp.mapping.select_prev_item(),
     }
 })
