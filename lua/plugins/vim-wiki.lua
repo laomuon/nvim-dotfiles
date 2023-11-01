@@ -16,6 +16,7 @@ return {
                 [".markdown"] = "markdown",
                 [".mdown"] = "markdown",
             }
+            vim.g.vimwiki_filetypes = {"markdown"}
         end,
         config = function ()
             vim.cmd([[
@@ -25,7 +26,7 @@ return {
                     return 0
                 endif
                 try
-                    execute '!firefox --new-window ' . a:link
+                    execute 'silent !firefox --new-window ' . a:link
                     return 1
                 catch
                     echo "This can happen for a variety of reasons ..."
