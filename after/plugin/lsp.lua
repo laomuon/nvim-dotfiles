@@ -13,6 +13,11 @@ require('mason-lspconfig').setup({
             local lua_opts = lsp.nvim_lua_ls()
             require('lspconfig').lua_ls.setup(lua_opts)
         end,
+        clangd = function ()
+            require('lspconfig').clangd.setup({
+                filetypes = {'c', 'cpp', 'objc', 'cuda'},
+            })
+        end,
         robotframework_ls = function()
             require('lspconfig').robotframework_ls.setup({
                 settings = {
