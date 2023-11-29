@@ -16,17 +16,28 @@ require('mason-lspconfig').setup({
         clangd = function ()
             require('lspconfig').clangd.setup({
                 filetypes = {'c', 'cpp', 'objc', 'cuda'},
+                on_new_config = function (config, root_dir)
+                    local stm32_project_path = '/home/muon/bare_metal_stm32'
+                    if vim.startswith(root_dir, stm32_project_path) then
+                        config.cmd = {'clangd', '--query-driver=/usr/bin/arm-none-eabi-gcc'}
+                    end
+                end
             })
         end,
         robotframework_ls = function()
             require('lspconfig').robotframework_ls.setup({
-                settings = {
-                    robot = {
-                        python = {
-                            executable = os.getenv("ROBOT_TEST_ENV_EXE")
+                on_new_config = function (config, root_dir)
+                    local auto_test_dir = '/home/muon/automated-testing'
+                    if vim.startswith(root_dir, auto_test_dir) then
+                        config.settings = {
+                            robot = {
+                                python = {
+                                    executable = os.getenv("ROBOT_TEST_ENV_EXE")
+                                }
+                            }
                         }
-                    }
-                }
+                    end
+                end
             })
         end,
     },
