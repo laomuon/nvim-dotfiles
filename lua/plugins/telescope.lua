@@ -43,6 +43,7 @@ telescope.config = function()
                     ["<C-k>"] = require("telescope.actions").move_selection_previous,
                 },
             },
+            path_display = {truncate = 2},
         },
     })
     return telescope
