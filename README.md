@@ -32,13 +32,13 @@ sudo apt-get install clangd-12
 sudo update-alternatives --install /usr/bin/clangd clangd /usr/bin/clangd-12 100
 ```
 
-### Robotframework (with robotframework_lsp)
+### Robotframework (with `robotframework_lsp`)
 
 ```bash
 pip install robotframework-lsp
 ```
 
-### Lua (with lua_ls)
+### Lua (with `lua_ls`)
 
 ```bash
 git clone https://github.com/LuaLS/lua-language-server
