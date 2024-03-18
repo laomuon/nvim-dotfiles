@@ -5,8 +5,12 @@ lsp.on_attach(function(client, bufnr)
     lsp.default_keymaps({buffer = bufnr, exclude = {"gd", "gr", "C-p"},})
 end)
 
--- python-lsp-server
+-- python (python-lsp-server + ruff_lsp)
 require('lspconfig').pylsp.setup({
+    root_dir = function(fname, _)
+        local ret = require('lspconfig').util.find_git_ancestor(fname)
+        return ret
+    end,
     settings = {
         pylsp = {
             plugins = {
@@ -34,6 +38,7 @@ require('lspconfig').pylsp.setup({
                 },
                 pyflakes = { enabled = false },
                 pycodestyle = { enabled = false },
+                ruff = { enabled = false },
                 -- type checker
                 pylsp_mypy = {
                     enabled = true,
@@ -42,17 +47,35 @@ require('lspconfig').pylsp.setup({
                 },
                 -- auto-completion options
                 jedi_completion = { fuzzy = true },
-                ruff = { enabled = true },
             },
         },
     },
 })
 
--- lua
+require('lspconfig').ruff_lsp.setup({
+    root_dir = function(fname, _)
+        local ret = require('lspconfig').util.find_git_ancestor(fname)
+        return ret
+    end,
+    configs = {
+        ruff_lsp = {
+            default_config = {
+                cmd = { 'ruff-lsp' },
+                filetypes = { 'python' },
+                init_options = {
+                    settings = {
+                        args = {}
+                    }
+                }
+            }
+        }
+    }
+})
+-- lua (lua_ls)
 local lua_opts = lsp.nvim_lua_ls()
 require('lspconfig').lua_ls.setup(lua_opts)
 
--- clangd
+-- C/C++ (clangd)
 require('lspconfig').clangd.setup({
     filetypes = {'c', 'cpp', 'objc', 'cuda'},
     on_new_config = function (config, root_dir)
@@ -63,7 +86,7 @@ require('lspconfig').clangd.setup({
     end
 })
 
--- robotframework_lsp
+-- robotframework (robotframework_lsp)
 require('lspconfig').robotframework_ls.setup({
     on_new_config = function (config, root_dir)
         local auto_test_dir = '/home/muon/automated-testing'

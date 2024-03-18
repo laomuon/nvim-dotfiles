@@ -18,7 +18,7 @@ chmod +x setup.sh
 ```bash
 pip install python-lsp-server
 pip install pylsp-mypy
-pip install python-lsp-ruff
+pip install ruff-lsp
 ```
 If you get an error similar to `install_requires` must be a string or list of strings
 ```bash
