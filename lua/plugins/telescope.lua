@@ -30,6 +30,9 @@ telescope.init = function()
     vim.keymap.set("n", "<leader>sd", function()
         require('telescope.builtin').diagnostics({bufnr=0})
     end)
+    vim.keymap.set("n", "<leader>gi", function()
+        require('telescope.builtin').lsp_implementation()
+    end)
 end
 
 telescope.config = function()

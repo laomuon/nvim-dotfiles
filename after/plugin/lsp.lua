@@ -1,5 +1,10 @@
+vim.api.nvim_create_autocmd({"BufRead", "BufNewFile"}, {
+    pattern = {"Jenkinsfile"},
+    command = "set filetype=groovy",
+})
 local lsp = require('lsp-zero')
 local robot_auto_test_dir = os.getenv("ROBOT_AUTO_TEST_DIR")
+local home_dir = os.getenv("HOME")
 
 lsp.on_attach(function(client, bufnr)
     lsp.default_keymaps({buffer = bufnr, exclude = {"gd", "gr", "C-p"},})
@@ -19,23 +24,7 @@ require('lspconfig').pylsp.setup({
                 autopep8 = { enabled = false },
                 yapf = { enabled = false },
                 -- linter options
-                pylint = {
-                    enabled = false,
-                    args = {
-                        '--max-line-length=120',
-                        '--enable=useless-suppression',
-                        '--disable=bad-option-value,duplicate-code,invalid-name, fixme, \
-                                missing-docstring,\
-                                protected-access,\
-                                too-few-public-methods,\
-                                too-many-arguments,\
-                                too-many-instance-attributes,\
-                                import-error,\
-                                consider-using-f-string,\
-                                logging-fstring-interpolation',
-                        '--extension-pkg-allow-list=cv2,PySide2,PyQt5',
-                    }
-                },
+                pylint = { enabled = false },
                 pyflakes = { enabled = false },
                 pycodestyle = { enabled = false },
                 ruff = { enabled = false },
@@ -46,7 +35,9 @@ require('lspconfig').pylsp.setup({
                     overrides = {'--check-untyped-defs', '--always-false=PYQT5', '--always-true=PYSIDE2', '--always-false=PYQT4', '--always-false=PYSIDE', true},
                 },
                 -- auto-completion options
-                jedi_completion = { fuzzy = true },
+                jedi_completion = {
+                    fuzzy = true,
+                },
             },
         },
     },
@@ -64,7 +55,9 @@ require('lspconfig').ruff_lsp.setup({
                 filetypes = { 'python' },
                 init_options = {
                     settings = {
-                        args = {}
+                        args = {
+                            lint = {run = "onSave"}
+                        }
                     }
                 }
             }
@@ -72,8 +65,7 @@ require('lspconfig').ruff_lsp.setup({
     }
 })
 -- lua (lua_ls)
-local lua_opts = lsp.nvim_lua_ls()
-require('lspconfig').lua_ls.setup(lua_opts)
+require('lspconfig').lua_ls.setup({})
 
 -- C/C++ (clangd)
 require('lspconfig').clangd.setup({
@@ -101,6 +93,15 @@ require('lspconfig').robotframework_ls.setup({
         end
     end
 })
+
+-- Groovy (groovyls)
+require'lspconfig'.groovyls.setup{
+    cmd = {"java", "-jar", home_dir .. "/groovy-language-server/build/libs/groovy-language-server-all.jar"},
+    filetypes = {"groovy", "Jenkinsfile"}
+}
+
+require'lspconfig'.cmake.setup{}
+
 lsp.set_sign_icons({
     error = '✘',
     warn = '▲',

@@ -6,7 +6,7 @@ local ts =  {
 }
 ts.config = function()
     require'nvim-treesitter.configs'.setup( {
-        ensure_installed = {"c", "bash", "lua", "python", "vim", "query", "cpp", "markdown"},
+        ensure_installed = {"c", "bash", "lua", "python", "vim", "query", "cpp", "markdown", "vimdoc"},
         sync_install = false,
         indent = {
             enable = true,
@@ -15,7 +15,7 @@ ts.config = function()
         highlight = {
             enable = true,
             disable = function (lang, bufnr)
-                return vim.api.nvim_buf_line_count(bufnr) > 5000
+                return vim.api.nvim_buf_line_count(bufnr) > 2000
             end,
             additional_vim_regex_highlighting = false,
         },
