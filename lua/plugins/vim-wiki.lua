@@ -6,17 +6,14 @@ return {
             vim.g.vimwiki_global_ext = 0
             vim.g.vimwiki_list = {
                 {
-                    path = "~/note",
-                    syntax = "markdown",
-                    ext = ".md",
+                    path = "~/notes_these",
+                },
+                {
+                    path = "~/personal_note/",
                 },
             }
-            vim.g.vimwiki_ext2syntax = {
-                [".md"] = "markdown",
-                [".markdown"] = "markdown",
-                [".mdown"] = "markdown",
-            }
-            vim.g.vimwiki_filetypes = {"markdown"}
+            vim.g.vimwiki_hl_headers = 1
+            vim.g.vimwiki_hl_cb_checked = 1
         end,
         config = function ()
             vim.cmd([[

@@ -102,6 +102,8 @@ require'lspconfig'.groovyls.setup{
 
 require'lspconfig'.cmake.setup{}
 
+require'lspconfig'.texlab.setup{}
+
 lsp.set_sign_icons({
     error = '✘',
     warn = '▲',
@@ -157,4 +159,4 @@ cmp.setup({
         ['<S-Tab>'] = cmp.mapping.select_prev_item(),
     }
 })
-
+vim.cmd('highlight Comment cterm=italic')
