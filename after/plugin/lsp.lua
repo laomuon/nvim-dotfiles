@@ -100,6 +100,16 @@ require'lspconfig'.groovyls.setup{
     filetypes = {"groovy", "Jenkinsfile"}
 }
 
+-- ltex (language-tool)
+require'lspconfig'.ltex.setup{
+  settings = {
+    ltex = {
+      language = "en-GB",
+    },
+  },
+  filetypes = {"tex", "bib"},
+}
+
 require'lspconfig'.cmake.setup{}
 
 require'lspconfig'.texlab.setup{}
