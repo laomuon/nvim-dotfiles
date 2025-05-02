@@ -43,7 +43,7 @@ require('lspconfig').pylsp.setup({
     },
 })
 
-require('lspconfig').ruff_lsp.setup({
+require('lspconfig').ruff.setup({
     root_dir = function(fname, _)
         local ret = require('lspconfig').util.find_git_ancestor(fname)
         return ret
@@ -71,9 +71,9 @@ require('lspconfig').lua_ls.setup({})
 require('lspconfig').clangd.setup({
     filetypes = {'c', 'cpp', 'objc', 'cuda'},
     on_new_config = function (config, root_dir)
-        local stm32_project_path = '/home/muon/bare_metal_stm32'
-        if vim.startswith(root_dir, stm32_project_path) then
-            config.cmd = {'clangd', '--query-driver=/usr/bin/arm-none-eabi-gcc'}
+        local oai_path = '/home/dmmuon/openairinterface5g'
+        if vim.startswith(root_dir, oai_path) then
+            config.cmd = {'clangd', '--compile-commands-dir=/home/dmmuon/openairinterface5g/cmake_targets/ran_build/build/'}
         end
     end
 })
@@ -100,11 +100,26 @@ require'lspconfig'.groovyls.setup{
     filetypes = {"groovy", "Jenkinsfile"}
 }
 
+local lt_email = os.getenv("LGT_USERNAME")
+local lt_key = os.getenv("LGT_KEY")
 -- ltex (language-tool)
-require'lspconfig'.ltex.setup{
+require'lspconfig'.ltex_plus.setup{
   settings = {
     ltex = {
-      language = "en-GB",
+      -- dictionary = {
+      --   ['en-US'] = {'embb', 'urllc', 'mmtc', 'Duc', 'mIoT', 'MIoT', 'MEAR', 'GeCode', 'VNF-FGE', 'QoS', 'Qos', 'gNB', 'gNBs', 'MILP'}
+      -- }
+      enabled=true,
+      language="en-GB",
+      languageToolOrg = {
+        username = lt_email,
+        apiKey = lt_key,
+      },
+      languageToolHttpServerUri = "https://api.languagetoolplus.com",
+      checkFrequency="save",
+      -- additionalRules = {
+      --      languageModel = '~/ngrams/',
+      --    },
     },
   },
   filetypes = {"tex", "bib"},
