@@ -11,11 +11,12 @@ lsp.on_attach(function(client, bufnr)
 end)
 
 -- python (python-lsp-server + ruff_lsp)
-require('lspconfig').pylsp.setup({
-    root_dir = function(fname, _)
-        local ret = require('lspconfig').util.find_git_ancestor(fname)
-        return ret
-    end,
+vim.lsp.config('pylsp', {
+    -- root_dir = function(fname, _)
+    --     local ret = require('lspconfig').util.find_git_ancestor(fname)
+    --     return ret
+    -- end,
+    root_markers = {'.git'},
     settings = {
         pylsp = {
             plugins = {
@@ -32,7 +33,7 @@ require('lspconfig').pylsp.setup({
                 pylsp_mypy = {
                     enabled = true,
                     live_mode = false,
-                    overrides = {'--check-untyped-defs', '--always-false=PYQT5', '--always-true=PYSIDE2', '--always-false=PYQT4', '--always-false=PYSIDE', true},
+                    overrides = {'--check-untyped-defs', '--always-false=PYQT5', '--always-false=PYSIDE2', '--always-false=PYQT4', '--always-true=PYSIDE', true},
                 },
                 -- auto-completion options
                 jedi_completion = {
@@ -42,12 +43,10 @@ require('lspconfig').pylsp.setup({
         },
     },
 })
+vim.lsp.enable('pylsp')
 
-require('lspconfig').ruff.setup({
-    root_dir = function(fname, _)
-        local ret = require('lspconfig').util.find_git_ancestor(fname)
-        return ret
-    end,
+vim.lsp.config('ruff',{
+    root_markers = {'.git'},
     configs = {
         ruff_lsp = {
             default_config = {
@@ -64,11 +63,13 @@ require('lspconfig').ruff.setup({
         }
     }
 })
+vim.lsp.enable('ruff')
 -- lua (lua_ls)
-require('lspconfig').lua_ls.setup({})
+vim.lsp.config("lua_ls", {})
+vim.lsp.enable('lua_ls')
 
 -- C/C++ (clangd)
-require('lspconfig').clangd.setup({
+vim.lsp.config("clangd",{
     filetypes = {'c', 'cpp', 'objc', 'cuda'},
     on_new_config = function (config, root_dir)
         local oai_path = '/home/dmmuon/openairinterface5g'
@@ -77,9 +78,10 @@ require('lspconfig').clangd.setup({
         end
     end
 })
+vim.lsp.enable('clangd')
 
 -- robotframework (robotframework_lsp)
-require('lspconfig').robotframework_ls.setup({
+vim.lsp.config("robotframework_ls",{
     on_new_config = function (config, root_dir)
         local auto_test_dir = '/home/muon/automated-testing'
         if vim.startswith(root_dir, auto_test_dir) then
@@ -93,17 +95,19 @@ require('lspconfig').robotframework_ls.setup({
         end
     end
 })
+vim.lsp.enable('robotframework_ls')
 
 -- Groovy (groovyls)
-require'lspconfig'.groovyls.setup{
+vim.lsp.config("groovyls",{
     cmd = {"java", "-jar", home_dir .. "/groovy-language-server/build/libs/groovy-language-server-all.jar"},
     filetypes = {"groovy", "Jenkinsfile"}
-}
+})
+vim.lsp.enable('groovyls')
 
 local lt_email = os.getenv("LGT_USERNAME")
 local lt_key = os.getenv("LGT_KEY")
 -- ltex (language-tool)
-require'lspconfig'.ltex_plus.setup{
+vim.lsp.config("ltex_plus",{
   settings = {
     ltex = {
       -- dictionary = {
@@ -123,11 +127,27 @@ require'lspconfig'.ltex_plus.setup{
     },
   },
   filetypes = {"tex", "bib"},
-}
+})
+vim.lsp.enable('ltex_plus')
 
-require'lspconfig'.cmake.setup{}
+vim.lsp.config("cmake", {})
+vim.lsp.enable('cmake')
 
-require'lspconfig'.texlab.setup{}
+vim.lsp.config("texlab", {})
+vim.lsp.enable('texlab')
+-- vim.lsp.config('*', {
+-- 	capabilities = {
+-- 		textDocument = {
+-- 			semanticTokens = { multilineTokenSupport = true }
+-- 		}
+-- 	},
+-- 	root_markers = { '.git' },
+-- })
+vim.lsp.config('harper', {
+	cmd = { 'harper-ls', '--stdio' },
+	filetypes = {'tex', 'latex', 'markdown', 'text', 'typst' },
+})
+-- vim.lsp.enable("harper")
 
 lsp.set_sign_icons({
     error = '✘',

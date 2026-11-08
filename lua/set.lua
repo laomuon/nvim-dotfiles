@@ -48,3 +48,4 @@ vim.o.foldenable = true
 vim.opt.path = vim.opt.path + "**"
 
 vim.g.editorconfig = false
+vim.g.clipboard = "xclip"

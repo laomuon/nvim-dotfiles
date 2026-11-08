@@ -3,7 +3,7 @@ local nvim_tree = {
     dependencies = {
         'nvim-tree/nvim-web-devicons', -- optional, for file icons
     },
-    version = "nightly",-- optional, updated every week. (see issue #1193)
+    version = "*",-- optional, updated every week. (see issue #1193)
     cmd = "NvimTreeFindFileToggle",
 }
 
@@ -25,6 +25,11 @@ nvim_tree.opts = {
             resize_window = true,
             quit_on_open=true,
         }
+    },
+    modified = {
+      enable = true,
+      show_on_dirs = true,
+      show_on_open_dirs = true,
     },
     view = {
         adaptive_size=true,

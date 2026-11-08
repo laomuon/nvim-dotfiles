@@ -9,7 +9,7 @@ ts.config = function()
         ensure_installed = {"c", "bash", "lua", "python", "vim", "query", "cpp", "markdown", "vimdoc"},
         sync_install = false,
         indent = {
-            enable = true,
+            enable = false,
         },
 
         highlight = {
