@@ -1,26 +1,21 @@
-local ts =  {
+return {
     "nvim-treesitter/nvim-treesitter",
-    dependencies = {{"nvim-treesitter/nvim-treesitter-context"}},
+    branch = "main",
+    lazy = false, -- the main branch does not support lazy-loading
     build = ":TSUpdate",
-    event = 'VeryLazy',
-}
-ts.config = function()
-    require'nvim-treesitter.configs'.setup( {
-        ensure_installed = {"c", "bash", "lua", "python", "vim", "query", "cpp", "markdown", "vimdoc"},
-        sync_install = false,
-        indent = {
-            enable = false,
-        },
-
-        highlight = {
-            enable = true,
-            disable = function (lang, bufnr)
-                return vim.api.nvim_buf_line_count(bufnr) > 2000
+    dependencies = { "nvim-treesitter/nvim-treesitter-context" },
+    config = function()
+        require("nvim-treesitter").install({
+            "c", "bash", "lua", "python", "vim", "query", "cpp",
+            "markdown", "markdown_inline", "vimdoc",
+        })
+        vim.api.nvim_create_autocmd("FileType", {
+            pattern = { "c", "cpp", "sh", "bash", "lua", "python", "vim", "query", "markdown", "help" },
+            callback = function(ev)
+                if vim.api.nvim_buf_line_count(ev.buf) <= 2000 then
+                    pcall(vim.treesitter.start, ev.buf)
+                end
             end,
-            additional_vim_regex_highlighting = false,
-        },
-    })
-    return ts
-end
-
-return ts
+        })
+    end,
+}

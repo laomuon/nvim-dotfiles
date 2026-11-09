@@ -37,8 +37,6 @@ vim.opt.scrolloff = 8
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
-vim.cmd('syntax enable')
-
 vim.o.foldmethod = 'indent'
 vim.o.foldcolumn = '1'
 vim.o.foldlevel = 99
