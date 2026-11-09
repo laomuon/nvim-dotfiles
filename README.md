@@ -1,10 +1,12 @@
 Dotfiles for my neovim config
 
-Total plugins: 27 (by Lazy)
+Plugins are managed by lazy.nvim and pinned in `lazy-lock.json`.
 
-Note: If on Ubuntu 18.04 or lower, build neovim from source to have neovim >= 0.9
+Requires Neovim 0.12 or later, because the `main` branch of nvim-treesitter does not support older versions.
 
 ## Setup
+
+`setup.sh` installs `ripgrep` and `tree-sitter-cli`. It needs `cargo`.
 
 ```bash
 chmod +x setup.sh
@@ -13,12 +15,14 @@ chmod +x setup.sh
 
 ## LSP server installation
 
-### Python (with `pylsp`)
+Default server configs come from nvim-lspconfig. My overrides are in `after/lsp/<server>.lua`, and the list of enabled servers is in `after/plugin/lsp.lua`.
+
+### Python (with `pylsp` and `ruff`)
 
 ```bash
 pip install python-lsp-server
 pip install pylsp-mypy
-pip install ruff-lsp
+pip install ruff
 ```
 If you get an error similar to `install_requires` must be a string or list of strings
 ```bash
@@ -53,3 +57,5 @@ Then add `lua-language-server` in `bin` folder to `PATH`
 sudo apt install latexmk
 cargo install --git https://github.com/latex-lsp/texlab --locked --tag v5.21.0
 ```
+
+Grammar checking uses `ltex-ls-plus`, which needs to be on `PATH`.
