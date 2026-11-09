@@ -20,14 +20,11 @@ Default server configs come from nvim-lspconfig. My overrides are in `after/lsp/
 ### Python (with `pylsp` and `ruff`)
 
 ```bash
-pip install python-lsp-server
-pip install pylsp-mypy
-pip install ruff
+uv tool install python-lsp-server --with pylsp-mypy
+uv tool install ruff
+uv tool install mypy
 ```
-If you get an error similar to `install_requires` must be a string or list of strings
-```bash
-pip install -U setuptools
-```
+Activate a project's venv before starting Neovim so that completion and `mypy` can see its packages.
 
 ### C/C++ (with `clangd`)
 
