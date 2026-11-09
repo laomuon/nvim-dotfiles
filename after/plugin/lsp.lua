@@ -2,13 +2,27 @@ vim.api.nvim_create_autocmd({"BufRead", "BufNewFile"}, {
     pattern = {"Jenkinsfile"},
     command = "set filetype=groovy",
 })
-local lsp = require('lsp-zero')
 local robot_auto_test_dir = os.getenv("ROBOT_AUTO_TEST_DIR")
 local home_dir = os.getenv("HOME")
 
-lsp.on_attach(function(client, bufnr)
-    lsp.default_keymaps({buffer = bufnr, exclude = {"gd", "gr", "C-p"},})
-end)
+-- Completion capabilities for every server
+vim.lsp.config('*', { capabilities = require('cmp_nvim_lsp').default_capabilities() })
+
+-- Keymaps for buffers with a language server ([d and ]d are Neovim defaults)
+vim.api.nvim_create_autocmd('LspAttach', {
+    callback = function(ev)
+        local map = function(mode, lhs, rhs) vim.keymap.set(mode, lhs, rhs, { buffer = ev.buf }) end
+        map('n', 'K', function() vim.lsp.buf.hover({ border = 'rounded' }) end)
+        map('n', 'gs', function() vim.lsp.buf.signature_help({ border = 'rounded' }) end)
+        map('n', 'gl', vim.diagnostic.open_float)
+        map('n', 'gD', vim.lsp.buf.declaration)
+        map('n', 'gi', vim.lsp.buf.implementation)
+        map('n', 'go', vim.lsp.buf.type_definition)
+        map('n', '<F2>', vim.lsp.buf.rename)
+        map({ 'n', 'x' }, '<F3>', function() vim.lsp.buf.format({ async = true }) end)
+        map({ 'n', 'x' }, '<F4>', vim.lsp.buf.code_action)
+    end,
+})
 
 -- python (python-lsp-server + ruff_lsp)
 vim.lsp.config('pylsp', {
@@ -68,32 +82,21 @@ vim.lsp.enable('ruff')
 vim.lsp.config("lua_ls", {})
 vim.lsp.enable('lua_ls')
 
--- C/C++ (clangd)
+-- C/C++ (clangd). OAI's compile_commands path is set in ~/openairinterface5g/.clangd
 vim.lsp.config("clangd",{
     filetypes = {'c', 'cpp', 'objc', 'cuda'},
-    on_new_config = function (config, root_dir)
-        local oai_path = '/home/dmmuon/openairinterface5g'
-        if vim.startswith(root_dir, oai_path) then
-            config.cmd = {'clangd', '--compile-commands-dir=/home/dmmuon/openairinterface5g/cmake_targets/ran_build/build/'}
-        end
-    end
 })
 vim.lsp.enable('clangd')
 
 -- robotframework (robotframework_lsp)
 vim.lsp.config("robotframework_ls",{
-    on_new_config = function (config, root_dir)
-        local auto_test_dir = '/home/muon/automated-testing'
-        if vim.startswith(root_dir, auto_test_dir) then
-            config.settings = {
-                robot = {
-                    python = {
-                        executable = os.getenv("ROBOT_TEST_ENV_EXE")
-                    }
-                }
+    settings = {
+        robot = {
+            python = {
+                executable = os.getenv("ROBOT_TEST_ENV_EXE")
             }
-        end
-    end
+        }
+    }
 })
 vim.lsp.enable('robotframework_ls')
 
@@ -149,36 +152,47 @@ vim.lsp.config('harper', {
 })
 -- vim.lsp.enable("harper")
 
-lsp.set_sign_icons({
-    error = '✘',
-    warn = '▲',
-    hint = '⚑',
-    info = ''
-})
 vim.diagnostic.config({
     virtual_text = true,
-    signs = true,
+    signs = {
+        text = {
+            [vim.diagnostic.severity.ERROR] = '✘',
+            [vim.diagnostic.severity.WARN] = '▲',
+            [vim.diagnostic.severity.HINT] = '⚑',
+            [vim.diagnostic.severity.INFO] = '',
+        },
+    },
     update_in_insert = false,
     underline = true,
     severity_sort = false,
     float = {
         style = 'minimal',
         border = 'rounded',
-        source = 'always',
+        source = true,
         header = '',
         prefix = '',
     },
 })
 local cmp = require('cmp')
-local cmp_action = lsp.cmp_action()
-local cmp_format = lsp.cmp_format()
 
 require('luasnip.loaders.from_vscode').lazy_load()
 
 vim.opt.completeopt = {'menu', 'menuone', 'noselect'}
 
 cmp.setup({
-    formatting = cmp_format,
+    snippet = {
+        expand = function(args)
+            require('luasnip').lsp_expand(args.body)
+        end,
+    },
+    formatting = {
+        fields = {'abbr', 'menu', 'kind'},
+        format = function(entry, item)
+            local names = {nvim_lsp = 'LSP', nvim_lua = 'nvim'}
+            item.menu = string.format('[%s]', names[entry.source.name] or entry.source.name)
+            return item
+        end,
+    },
     preselect = 'item',
     completion = {
         completeopt = 'menu,menuone,noinsert'
@@ -194,6 +208,24 @@ cmp.setup({
         {name = 'luasnip', keyword_length = 2},
     },
     mapping = {
+        ['<C-y>'] = cmp.mapping.confirm({select = false}),
+        ['<C-e>'] = cmp.mapping.abort(),
+        ['<Up>'] = cmp.mapping.select_prev_item({behavior = 'select'}),
+        ['<Down>'] = cmp.mapping.select_next_item({behavior = 'select'}),
+        ['<C-p>'] = cmp.mapping(function()
+            if cmp.visible() then
+                cmp.select_prev_item({behavior = 'insert'})
+            else
+                cmp.complete()
+            end
+        end),
+        ['<C-n>'] = cmp.mapping(function()
+            if cmp.visible() then
+                cmp.select_next_item({behavior = 'insert'})
+            else
+                cmp.complete()
+            end
+        end),
         -- `Enter` key to confirm completion
         ['<CR>'] = cmp.mapping.confirm({select = true}),
         ['<C-j>'] = cmp.mapping.select_next_item(),

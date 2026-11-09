@@ -1,7 +1,6 @@
 return {
     "junegunn/fzf",
     "junegunn/fzf.vim",
-    {"VonHeikemen/lsp-zero.nvim", branch = 'v3.x'},
 
     -- LSP Support
     {'neovim/nvim-lspconfig'},
