@@ -8,6 +8,8 @@ Requires Neovim 0.12 or later, because the `main` branch of nvim-treesitter does
 
 `setup.sh` installs `ripgrep` and `tree-sitter-cli`. It needs `cargo`.
 
+Fuzzy finding uses fzf-lua, which needs `fzf` on `PATH`.
+
 ```bash
 chmod +x setup.sh
 ./setup.sh
