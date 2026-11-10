@@ -26,7 +26,7 @@ uv tool install python-lsp-server --with pylsp-mypy
 uv tool install ruff
 uv tool install mypy
 ```
-Activate a project's venv before starting Neovim so that completion and `mypy` can see its packages.
+`pylsp` and `mypy` use the venv in the project's root by themselves: `.venv` if there is one, otherwise any folder with a `pyvenv.cfg`. A venv elsewhere has to be activated before starting Neovim, and an activated venv takes priority.
 
 ### C/C++ (with `clangd`)
 
